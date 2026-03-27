@@ -1,5 +1,8 @@
 package com.ecommerce.warehouseservice.controller;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.ecommerce.warehouseservice.service.InventoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +13,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/warehouse")
 public class WarehouseController {
-    private final InventoryService inventoryService;
+    private static final Logger log = LoggerFactory.getLogger(WarehouseController.class);
+private final InventoryService inventoryService;
 
     public WarehouseController(InventoryService inventoryService) {
         this.inventoryService = inventoryService;
@@ -45,7 +49,7 @@ public class WarehouseController {
         int stock = ((Number) stockObj).intValue();
 
         inventoryService.addOrUpdateProduct(productId, stock);
-        System.out.println("[WarehouseService] Added product " + productId + " to inventory with stock: " + stock);
+        log.info("Added product {} to inventory with stock: {}", productId, stock);
         return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(
                 Map.of("productId", productId, "stock", stock)
         );
@@ -53,7 +57,7 @@ public class WarehouseController {
 
     @PatchMapping("/inventory/{productId}")
     public ResponseEntity<?> updateStock(@PathVariable Long productId, @RequestBody Map<String, Object> body) {
-        System.out.println("[WarehouseService] PATCH /inventory/" + productId + " received with body: " + body);
+        log.info("PATCH /inventory/{} received with body: {}", productId, body);
 
         Object quantityObj = body.get("quantity");
         Object newStockObj = body.get("newStock");
@@ -67,14 +71,13 @@ public class WarehouseController {
         } else if (valueObj instanceof String) {
             quantity = Integer.parseInt((String) valueObj);
         } else if (valueObj == null) {
-            System.err.println("[WarehouseService] ERROR: Missing required field in PATCH request");
+            log.error("ERROR: Missing required field in PATCH request");
             return ResponseEntity.badRequest().body(
                     Map.of("error", "Missing required field: either 'quantity' (delta) or 'newStock' (absolute value)")
             );
         }
 
-        System.out.println("[WarehouseService] Updating inventory for product " + productId +
-                (isAbsoluteValue ? " with newStock: " : " with quantity delta: ") + quantity);
+        log.info("Updating inventory for product {}{}{}", productId, isAbsoluteValue ? " with newStock: " : " with quantity delta: ", quantity);
 
         if (isAbsoluteValue) {
             inventoryService.setStockAbsolute(productId, quantity);
@@ -83,7 +86,7 @@ public class WarehouseController {
         }
 
         Integer newStock = inventoryService.getStock(productId);
-        System.out.println("[WarehouseService] Product " + productId + " new stock: " + newStock);
+        log.info("Product {} new stock: {}", productId, newStock);
         return ResponseEntity.ok(Map.of("productId", productId, "newStock", newStock));
     }
 }

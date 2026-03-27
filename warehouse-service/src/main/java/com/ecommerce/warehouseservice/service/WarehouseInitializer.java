@@ -1,7 +1,13 @@
 package com.ecommerce.warehouseservice.service;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -12,7 +18,8 @@ import java.util.Map;
 @Component
 @ConditionalOnProperty(name = "warehouse.sync-on-startup", havingValue = "true", matchIfMissing = true)
 public class WarehouseInitializer implements CommandLineRunner {
-    private final RestTemplate restTemplate;
+    private static final Logger log = LoggerFactory.getLogger(WarehouseInitializer.class);
+private final RestTemplate restTemplate;
     private final InventoryService inventoryService;
     private static final String CATALOGUE_URL = "http://localhost:8082/products";
 
@@ -26,10 +33,17 @@ public class WarehouseInitializer implements CommandLineRunner {
         Thread.sleep(2000);
 
         try {
-            System.out.println("[WarehouseService] Syncing initial products from catalogue...");
+            log.info("Syncing initial products from catalogue...");
 
-            List<Map<String, Object>> products = restTemplate.getForObject(CATALOGUE_URL, List.class);
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    CATALOGUE_URL,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
 
+            List<Map<String, Object>> products = response.getBody();
             if (products != null && !products.isEmpty()) {
                 int count = 0;
                 for (Map<String, Object> product : products) {
@@ -43,21 +57,21 @@ public class WarehouseInitializer implements CommandLineRunner {
 
                             if (inventoryService.getStock(productId) == null) {
                                 inventoryService.addOrUpdateProduct(productId, stock);
-                                System.out.println("[WarehouseService] Synced product " + productId + " with stock: " + stock);
+                                log.info("Synced product {} with stock: {}", productId, stock);
                                 count++;
                             }
                         }
                     } catch (Exception e) {
-                        System.err.println("[WarehouseService] Error syncing product: " + e.getMessage());
+                        log.error("Error syncing product: {}", e.getMessage());
                     }
                 }
-                System.out.println("[WarehouseService] Synced " + count + " new products from catalogue");
+                log.info("Synced {} new products from catalogue", count);
             } else {
-                System.out.println("[WarehouseService] No products found in catalogue or empty response");
+                log.info("No products found in catalogue or empty response");
             }
         } catch (RestClientException e) {
-            System.err.println("[WarehouseService] Failed to sync products from catalogue: " + e.getMessage());
-            System.err.println("[WarehouseService] Proceeding with existing inventory");
+            log.error("Failed to sync products from catalogue: {}", e.getMessage());
+            log.error("Proceeding with existing inventory");
         }
     }
 }

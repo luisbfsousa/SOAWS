@@ -1,5 +1,8 @@
 package com.ecommerce.paymentservice.controller;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.ecommerce.paymentservice.model.OrderMessage;
 import com.ecommerce.paymentservice.model.Payment;
 import com.ecommerce.paymentservice.service.PaymentRepository;
@@ -14,7 +17,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/payments")
 public class PaymentController {
-    public static final String ORDER_QUEUE = "order.confirmed";
+    private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
+public static final String ORDER_QUEUE = "order.confirmed";
     private final PaymentRepository paymentRepository;
     private final JmsTemplate jmsTemplate;
 
@@ -44,7 +48,7 @@ public class PaymentController {
 
         OrderMessage orderMessage = new OrderMessage(transactionId, sessionId, amount, customerAddress);
         jmsTemplate.convertAndSend(ORDER_QUEUE, orderMessage);
-        System.out.println("[PaymentService] Published to queue: " + transactionId);
+        log.info("Published to queue: {}", transactionId);
 
         return ResponseEntity.ok(Map.of(
                 "success", true,

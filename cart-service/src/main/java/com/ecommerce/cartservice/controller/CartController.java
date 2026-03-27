@@ -1,5 +1,8 @@
 package com.ecommerce.cartservice.controller;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.ecommerce.cartservice.model.CartItem;
 import com.ecommerce.cartservice.service.CartItemRepository;
 import com.ecommerce.cartservice.service.CatalogueClient;
@@ -18,6 +21,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/cart")
 public class CartController {
+    private static final Logger log = LoggerFactory.getLogger(CartController.class);
     private static final double SHIPPING_COST = 5.99;
     private final CartItemRepository cartItemRepository;
     private final CatalogueClient catalogueClient;
@@ -84,9 +88,9 @@ public class CartController {
     @Transactional
     @PostMapping("/{sessionId}/checkout")
     public ResponseEntity<?> checkout(@PathVariable String sessionId, @RequestBody Map<String, String> body) {
-        System.out.println("[CartService] ========== CHECKOUT STARTED for session: " + sessionId + " ==========");
+        log.info("========== CHECKOUT STARTED for session: {} ==========", sessionId);
         List<CartItem> items = cartItemRepository.findBySessionId(sessionId);
-        System.out.println("[CartService] Found " + items.size() + " items in cart");
+        log.info("Found {} items in cart", items.size());
 
         if (items.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Empty cart"));
@@ -106,7 +110,7 @@ public class CartController {
 
             int availableStock = (warehouseStock >= 0) ? Math.min(catalogueStock, warehouseStock) : catalogueStock;
 
-            System.out.println("[CartService] Product " + item.getProductId() + " - Catalogue: " + catalogueStock + ", Warehouse: " + warehouseStock + ", Available: " + availableStock);
+            log.info("Product {} - Catalogue: {}, Warehouse: {}, Available: {}", item.getProductId(), catalogueStock, warehouseStock, availableStock);
 
             if (availableStock < item.getQuantity()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Insufficient stock for " + item.getProductName() + ". Available: " + availableStock + ", Requested: " + item.getQuantity()));
@@ -116,45 +120,45 @@ public class CartController {
         double subtotal = items.stream().mapToDouble(i -> i.getProductPrice() * i.getQuantity()).sum();
         double total = subtotal + SHIPPING_COST;
 
-        System.out.println("[CartService] Processing payment: subtotal=" + subtotal + ", total=" + total);
+        log.info("Processing payment: subtotal={}, total={}", subtotal, total);
         Map<String, Object> paymentResult = paymentClient.processPayment(sessionId, total, paymentMethod, customerAddress);
         boolean paymentSuccess = Boolean.TRUE.equals(paymentResult.get("success"));
-        System.out.println("[CartService] Payment response: " + paymentResult);
-        System.out.println("[CartService] Payment success: " + paymentSuccess);
+        log.info("Payment response: {}", paymentResult);
+        log.info("Payment success: {}", paymentSuccess);
 
         if (!paymentSuccess) {
-            System.err.println("[CartService] Payment failed, aborting checkout");
+            log.error("Payment failed, aborting checkout");
             return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(Map.of("error", "Payment failed", "details", paymentResult));
         }
 
-        System.out.println("[CartService] ========== STARTING STOCK DECREMENTS ==========");
+        log.info("========== STARTING STOCK DECREMENTS ==========");
         boolean allDecrementsOk = true;
         for (CartItem item : items) {
-            System.out.println("[CartService] ========== DECREMENTING PRODUCT " + item.getProductId() + " ==========");
-            System.out.println("[CartService] Calling warehouseClient.decrementStock(" + item.getProductId() + ", " + item.getQuantity() + ")");
+            log.info("========== DECREMENTING PRODUCT {} ==========", item.getProductId());
+            log.info("Calling warehouseClient.decrementStock({}, {})", item.getProductId(), item.getQuantity());
             boolean warehouseOk = warehouseClient.decrementStock(item.getProductId(), item.getQuantity());
-            System.out.println("[CartService] Warehouse decrement result: " + (warehouseOk ? "SUCCESS" : "FAILED"));
+            log.info("Warehouse decrement result: {}", warehouseOk ? "SUCCESS" : "FAILED");
 
-            System.out.println("[CartService] Calling catalogueClient.decrementStock(" + item.getProductId() + ", " + item.getQuantity() + ")");
+            log.info("Calling catalogueClient.decrementStock({}, {})", item.getProductId(), item.getQuantity());
             boolean catalogueOk = catalogueClient.decrementStock(item.getProductId(), item.getQuantity());
-            System.out.println("[CartService] Catalogue decrement result: " + (catalogueOk ? "SUCCESS" : "FAILED"));
+            log.info("Catalogue decrement result: {}", catalogueOk ? "SUCCESS" : "FAILED");
 
-            System.out.println("[CartService] Product " + item.getProductId() + " - Warehouse: " + (warehouseOk ? "SUCCESS" : "FAILED") + ", Catalogue: " + (catalogueOk ? "SUCCESS" : "FAILED"));
+            log.info("Product {} - Warehouse: {}, Catalogue: {}", item.getProductId(), warehouseOk ? "SUCCESS" : "FAILED", catalogueOk ? "SUCCESS" : "FAILED");
 
             if (!warehouseOk) {
-                System.err.println("[CartService] WARNING: Failed to decrement warehouse stock for product " + item.getProductId());
+                log.error("WARNING: Failed to decrement warehouse stock for product {}", item.getProductId());
                 allDecrementsOk = false;
             }
             if (!catalogueOk) {
-                System.err.println("[CartService] WARNING: Failed to decrement catalogue stock for product " + item.getProductId());
+                log.error("WARNING: Failed to decrement catalogue stock for product {}", item.getProductId());
                 allDecrementsOk = false;
             }
         }
 
         if (!allDecrementsOk) {
-            System.err.println("[CartService] WARNING: Some stock decrements failed, but order was already processed");
+            log.error("WARNING: Some stock decrements failed, but order was already processed");
         }
-        System.out.println("[CartService] ========== STOCK DECREMENTS COMPLETE ==========");
+        log.info("========== STOCK DECREMENTS COMPLETE ==========");
 
         cartItemRepository.deleteBySessionId(sessionId);
 

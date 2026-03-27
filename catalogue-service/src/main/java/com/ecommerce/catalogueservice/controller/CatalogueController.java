@@ -1,5 +1,8 @@
 package com.ecommerce.catalogueservice.controller;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.ecommerce.catalogueservice.model.Product;
 import com.ecommerce.catalogueservice.service.ProductRepository;
 import com.ecommerce.catalogueservice.service.WarehouseService;
@@ -15,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/products")
 public class CatalogueController {
+    private static final Logger log = LoggerFactory.getLogger(CatalogueController.class);
     private final ProductRepository productRepository;
     private final WarehouseService warehouseService;
 
@@ -52,8 +56,7 @@ public class CatalogueController {
         Product savedProduct = productRepository.save(product);
         warehouseService.syncProductToWarehouse(
                 savedProduct.getId(),
-                savedProduct.getStockQuantity(),
-                savedProduct.getWarehouseId()
+                savedProduct.getStockQuantity()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
@@ -83,12 +86,12 @@ public class CatalogueController {
         }
 
         final int delta = deltaValue;
-        System.out.println("[CatalogueService] Updating stock for product " + id + " with delta: " + delta);
+        log.info("Updating stock for product {} with delta: {}", id, delta);
         return productRepository.findById(id).map(p -> {
             int newStock = Math.max(0, p.getStockQuantity() + delta);
             p.setStockQuantity(newStock);
             productRepository.save(p);
-            System.out.println("[CatalogueService] New stock for product " + id + ": " + newStock);
+            log.info("New stock for product {}: {}", id, newStock);
             return ResponseEntity.ok(Map.of("id", id, "newStock", p.getStockQuantity()));
         }).orElse(ResponseEntity.notFound().build());
     }

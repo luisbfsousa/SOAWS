@@ -1,5 +1,8 @@
 package com.ecommerce.cartservice.service;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -8,8 +11,8 @@ import java.util.Map;
 
 @Component
 public class PaymentClient {
-
-    private final RestTemplate restTemplate;
+    private static final Logger log = LoggerFactory.getLogger(PaymentClient.class);
+private final RestTemplate restTemplate;
     private final String paymentBaseUrl;
 
     public PaymentClient(RestTemplate restTemplate,
@@ -30,7 +33,7 @@ public class PaymentClient {
         try {
             return restTemplate.postForObject(paymentBaseUrl + "/payments", request, Map.class);
         } catch (Exception e) {
-            System.err.println("[CartService] Payment Service unreachable: " + e.getMessage());
+            log.error("Payment Service unreachable: {}", e.getMessage());
             return Map.of("success", false, "error", "Payment service unavailable");
         }
     }

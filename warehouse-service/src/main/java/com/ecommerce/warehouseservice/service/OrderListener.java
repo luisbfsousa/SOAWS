@@ -1,5 +1,9 @@
 package com.ecommerce.warehouseservice.service;
 
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.ecommerce.warehouseservice.model.ShipmentMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.jms.annotation.JmsListener;
@@ -11,6 +15,7 @@ import java.util.UUID;
 
 @Component
 public class OrderListener {
+    private static final Logger log = LoggerFactory.getLogger(OrderListener.class);
     public static final String ORDER_QUEUE = "order.confirmed";
     public static final String SHIPMENT_QUEUE = "order.shipped";
     private final JmsTemplate jmsTemplate;
@@ -24,20 +29,24 @@ public class OrderListener {
     @JmsListener(destination = ORDER_QUEUE)
     public void onOrderReceived(String rawMessage) {
         try {
-            Map<String, Object> order = objectMapper.readValue(rawMessage, Map.class);
+            Map<String, Object> order = objectMapper.readValue(
+                    rawMessage,
+                    new TypeReference<>() {
+                    }
+            );
             String transactionId = (String) order.get("transactionId");
             String sessionId = (String) order.get("sessionId");
             String customerAddress = (String) order.getOrDefault("customerAddress", "Unknown");
 
-            System.out.println("[WarehouseService] Received order for transaction: " + transactionId);
-            System.out.println("[WarehouseService] Preparing shipment to: " + customerAddress);
+            log.info("Received order for transaction: {}", transactionId);
+            log.info("Preparing shipment to: {}", customerAddress);
             String trackingCode = "TRACK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
             ShipmentMessage shipment = new ShipmentMessage(transactionId, sessionId, trackingCode, customerAddress);
             jmsTemplate.convertAndSend(SHIPMENT_QUEUE, shipment);
-            System.out.println("[WarehouseService] Order shipped. Tracking: " + trackingCode);
+            log.info("Order shipped. Tracking: {}", trackingCode);
         } catch (Exception e) {
-            System.err.println("[WarehouseService] Failed to process order message: " + e.getMessage());
+            log.error("Failed to process order message: {}", e.getMessage());
         }
     }
 }

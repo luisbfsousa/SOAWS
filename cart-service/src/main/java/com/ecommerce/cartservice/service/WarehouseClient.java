@@ -1,5 +1,8 @@
 package com.ecommerce.cartservice.service;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,8 +15,8 @@ import java.util.Map;
 
 @Component
 public class WarehouseClient {
-
-    private final RestTemplate restTemplate;
+    private static final Logger log = LoggerFactory.getLogger(WarehouseClient.class);
+private final RestTemplate restTemplate;
     private final String warehouseBaseUrl;
 
     public WarehouseClient(RestTemplate restTemplate,
@@ -30,9 +33,9 @@ public class WarehouseClient {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Integer>> entity = new HttpEntity<>(request, headers);
 
-            System.out.println("[WarehouseClient] DECREMENT - URL: " + url);
-            System.out.println("[WarehouseClient] DECREMENT - Request: " + request);
-            System.out.println("[WarehouseClient] DECREMENT - Sending PATCH request...");
+            log.info("DECREMENT - URL: {}", url);
+            log.info("DECREMENT - Request: {}", request);
+            log.info("DECREMENT - Sending PATCH request...");
 
             var response = restTemplate.exchange(
                     url,
@@ -41,21 +44,20 @@ public class WarehouseClient {
                     Map.class
             );
 
-            System.out.println("[WarehouseClient] DECREMENT - Status: " + response.getStatusCode());
-            System.out.println("[WarehouseClient] DECREMENT - Response body: " + response.getBody());
+            log.info("DECREMENT - Status: {}", response.getStatusCode());
+            log.info("DECREMENT - Response body: {}", response.getBody());
 
             boolean success = response.getStatusCode().is2xxSuccessful();
-            System.out.println("[WarehouseClient] DECREMENT - Success: " + success);
+            log.info("DECREMENT - Success: {}", success);
 
             if (!success) {
-                System.err.println("[WarehouseClient] ERROR: Decrement returned non-2xx status: " + response.getStatusCode());
+                log.error("ERROR: Decrement returned non-2xx status: {}", response.getStatusCode());
             }
             return success;
         } catch (Exception e) {
-            System.err.println("[WarehouseClient] EXCEPTION during decrementStock for product " + productId);
-            System.err.println("[WarehouseClient] Exception type: " + e.getClass().getName());
-            System.err.println("[WarehouseClient] Exception message: " + e.getMessage());
-            e.printStackTrace();
+            log.error("EXCEPTION during decrementStock for product {}", productId);
+            log.error("Exception type: {}", e.getClass().getName());
+            log.error("Exception message: {}", e.getMessage());
             return false;
         }
     }
@@ -64,23 +66,22 @@ public class WarehouseClient {
     public int getWarehouseStock(Long productId) {
         try {
             String url = warehouseBaseUrl + "/warehouse/inventory/" + productId;
-            System.out.println("[CartService] Fetching warehouse stock from: " + url);
+            log.info("Fetching warehouse stock from: {}", url);
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-            System.out.println("[CartService] Warehouse response for product " + productId + ": " + response);
+            log.info("Warehouse response for product {}: {}", productId, response);
 
             if (response != null) {
                 Object stock = response.get("stock");
                 if (stock instanceof Number) {
                     int stockValue = ((Number) stock).intValue();
-                    System.out.println("[CartService] Product " + productId + " warehouse stock: " + stockValue);
+                    log.info("Product {} warehouse stock: {}", productId, stockValue);
                     return stockValue;
                 }
             }
-            System.err.println("[CartService] Invalid warehouse response for product " + productId + ": missing 'stock' field");
+            log.error("Invalid warehouse response for product {}: missing 'stock' field", productId);
             return -1;
         } catch (Exception e) {
-            System.err.println("[CartService] Failed to get warehouse stock for product " + productId + ": " + e.getClass().getSimpleName() + " - " + e.getMessage());
-            e.printStackTrace();
+            log.error("Failed to get warehouse stock for product {}: {} - {}", productId, e.getClass().getSimpleName(), e.getMessage());
             return -1;
         }
     }
