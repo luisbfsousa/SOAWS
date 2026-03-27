@@ -42,7 +42,6 @@ public class PaymentController{
             return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Invalid payment amount"));
         }
 
-        // --- ASYNCHRONOUS: Payment → [order.confirmed] → Warehouse ---
         OrderMessage orderMessage = new OrderMessage(transactionId, sessionId, amount, customerAddress);
         jmsTemplate.convertAndSend(ORDER_QUEUE, orderMessage);
         System.out.println("[PaymentService] Published to queue: " + transactionId);

@@ -2,6 +2,7 @@ package com.ecommerce.catalogueservice.controller;
 
 import com.ecommerce.catalogueservice.model.Product;
 import com.ecommerce.catalogueservice.service.ProductRepository;
+import com.ecommerce.catalogueservice.service.WarehouseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,8 +16,11 @@ import java.util.Map;
 @RequestMapping("/products")
 public class CatalogueController{
     private final ProductRepository productRepository;
-    public CatalogueController(ProductRepository productRepository){
+    private final WarehouseService warehouseService;
+    
+    public CatalogueController(ProductRepository productRepository, WarehouseService warehouseService){
         this.productRepository = productRepository;
+        this.warehouseService = warehouseService;
     }
 
     @GetMapping
@@ -39,7 +43,13 @@ public class CatalogueController{
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product){
-        return ResponseEntity.status(HttpStatus.CREATED).body(productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+        warehouseService.syncProductToWarehouse(
+            savedProduct.getId(),
+            savedProduct.getStockQuantity(),
+            savedProduct.getWarehouseId()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
 
     @PutMapping("/{id}")

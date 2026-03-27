@@ -32,7 +32,6 @@ public class OrderListener{
             System.out.println("[WarehouseService] Preparing shipment to: " + customerAddress);
             String trackingCode = "TRACK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-            // --- ASYNC MESSAGE: Warehouse → Notification ---
             ShipmentMessage shipment = new ShipmentMessage(transactionId, sessionId, trackingCode, customerAddress);
             jmsTemplate.convertAndSend(SHIPMENT_QUEUE, shipment);
             System.out.println("[WarehouseService] Order shipped. Tracking: " + trackingCode);

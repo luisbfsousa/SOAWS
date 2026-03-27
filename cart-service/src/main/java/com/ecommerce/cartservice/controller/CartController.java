@@ -38,12 +38,10 @@ public class CartController{
         return ResponseEntity.ok(Map.of("items", items, "subtotal", subtotal));
     }
 
-    // SYNCHRONOUS call to Catalogue Service to verify product exists and is in stock
     @PostMapping("/{sessionId}/items")
     public ResponseEntity<?> addItem(@PathVariable String sessionId, @RequestBody Map<String, Object> body){
         Long productId = Long.valueOf(body.get("productId").toString());
         int quantity = Integer.parseInt(body.getOrDefault("quantity", 1).toString());
-        //SYNCHRONOUS REST CALL: Cart -> Catalogue
         Map<String,Object> product = catalogueClient.getProduct(productId);
         if(product == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Product not found"));
@@ -53,7 +51,6 @@ public class CartController{
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Product is out of stock"));
         }
         
-        // Check if requested quantity exceeds available stock
         if(quantity > stock){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Insufficient stock. Available: " + stock + ", Requested: " + quantity));
         }
@@ -84,12 +81,13 @@ public class CartController{
         return ResponseEntity.noContent().build();
     }
 
-    // Sync: Cart -> Catalogue (stock check) -> Payment (charge)
-    // Async: Payment -> [order.confirmed queue] -> Warehouse
     @Transactional
     @PostMapping("/{sessionId}/checkout")
     public ResponseEntity<?> checkout(@PathVariable String sessionId, @RequestBody Map<String, String> body){
+        System.out.println("[CartService] ========== CHECKOUT STARTED for session: " + sessionId + " ==========");
         List<CartItem> items = cartItemRepository.findBySessionId(sessionId);
+        System.out.println("[CartService] Found " + items.size() + " items in cart");
+        
         if(items.isEmpty()){
             return ResponseEntity.badRequest().body(Map.of("error", "Empty cart"));
         }
@@ -97,20 +95,16 @@ public class CartController{
         String customerAddress = body.getOrDefault("address", "Unknown");
         String paymentMethod = body.getOrDefault("paymentMethod", "card");
 
-        //SYNCHRONOUS verify stock - check BOTH warehouse AND catalogue
         for(CartItem item : items){
-            // Check catalogue stock
             Map<String, Object> product = catalogueClient.getProduct(item.getProductId());
             if(product == null){
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Item no longer available: " + item.getProductName()));
             }
             int catalogueStock = (int) product.getOrDefault("stockQuantity", 0);
             
-            // Check warehouse stock
             int warehouseStock = warehouseClient.getWarehouseStock(item.getProductId());
             
-            // Use the minimum of the two as the authoritative stock
-            int availableStock = Math.min(catalogueStock, warehouseStock);
+            int availableStock = (warehouseStock >= 0) ? Math.min(catalogueStock, warehouseStock) : catalogueStock;
             
             System.out.println("[CartService] Product " + item.getProductId() + " - Catalogue: " + catalogueStock + ", Warehouse: " + warehouseStock + ", Available: " + availableStock);
             
@@ -122,22 +116,45 @@ public class CartController{
         double subtotal = items.stream().mapToDouble(i -> i.getProductPrice() * i.getQuantity()).sum();
         double total = subtotal + SHIPPING_COST;
 
-        //SYNCHRONOUS process payment
+        System.out.println("[CartService] Processing payment: subtotal=" + subtotal + ", total=" + total);
         Map<String, Object> paymentResult = paymentClient.processPayment(sessionId, total, paymentMethod, customerAddress);
         boolean paymentSuccess = Boolean.TRUE.equals(paymentResult.get("success"));
+        System.out.println("[CartService] Payment response: " + paymentResult);
+        System.out.println("[CartService] Payment success: " + paymentSuccess);
 
         if(!paymentSuccess){
+            System.err.println("[CartService] Payment failed, aborting checkout");
             return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(Map.of("error", "Payment failed", "details", paymentResult));
         }
 
-        // DECREMENT STOCK after successful payment
-        System.out.println("[CartService] Payment successful. Decrementing stock for " + items.size() + " items...");
+        System.out.println("[CartService] ========== STARTING STOCK DECREMENTS ==========");
+        boolean allDecrementsOk = true;
         for(CartItem item : items){
-            System.out.println("[CartService] Decrementing product " + item.getProductId() + " by " + item.getQuantity());
+            System.out.println("[CartService] ========== DECREMENTING PRODUCT " + item.getProductId() + " ==========");
+            System.out.println("[CartService] Calling warehouseClient.decrementStock(" + item.getProductId() + ", " + item.getQuantity() + ")");
             boolean warehouseOk = warehouseClient.decrementStock(item.getProductId(), item.getQuantity());
+            System.out.println("[CartService] Warehouse decrement result: " + (warehouseOk ? "SUCCESS" : "FAILED"));
+            
+            System.out.println("[CartService] Calling catalogueClient.decrementStock(" + item.getProductId() + ", " + item.getQuantity() + ")");
             boolean catalogueOk = catalogueClient.decrementStock(item.getProductId(), item.getQuantity());
-            System.out.println("[CartService] Product " + item.getProductId() + " - Warehouse: " + warehouseOk + ", Catalogue: " + catalogueOk);
+            System.out.println("[CartService] Catalogue decrement result: " + (catalogueOk ? "SUCCESS" : "FAILED"));
+            
+            System.out.println("[CartService] Product " + item.getProductId() + " - Warehouse: " + (warehouseOk ? "SUCCESS" : "FAILED") + ", Catalogue: " + (catalogueOk ? "SUCCESS" : "FAILED"));
+            
+            if (!warehouseOk) {
+                System.err.println("[CartService] WARNING: Failed to decrement warehouse stock for product " + item.getProductId());
+                allDecrementsOk = false;
+            }
+            if (!catalogueOk) {
+                System.err.println("[CartService] WARNING: Failed to decrement catalogue stock for product " + item.getProductId());
+                allDecrementsOk = false;
+            }
         }
+        
+        if (!allDecrementsOk) {
+            System.err.println("[CartService] WARNING: Some stock decrements failed, but order was already processed");
+        }
+        System.out.println("[CartService] ========== STOCK DECREMENTS COMPLETE ==========");
 
         cartItemRepository.deleteBySessionId(sessionId);
 

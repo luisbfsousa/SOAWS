@@ -40,23 +40,41 @@ public class CatalogueClient {
     }
 
     public boolean decrementStock(Long productId, int quantity) {
+        String url = catalogueBaseUrl + "/products/" + productId + "/stock";
         try {
             Map<String, Integer> request = Map.of("delta", -quantity);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Integer>> entity = new HttpEntity<>(request, headers);
+            
+            System.out.println("[CatalogueClient] DECREMENT - URL: " + url);
+            System.out.println("[CatalogueClient] DECREMENT - Request: " + request);
+            System.out.println("[CatalogueClient] DECREMENT - Sending PATCH request...");
+            
             var response = restTemplate.exchange(
-                    catalogueBaseUrl + "/products/" + productId + "/stock",
+                    url,
                     HttpMethod.PATCH,
                     entity,
                     Map.class
             );
-            System.out.println("[CartService] Decremented catalogue stock for product " + productId + ". Status: " + response.getStatusCode() + ", Response: " + response.getBody());
-            return response.getStatusCode().is2xxSuccessful();
+            
+            System.out.println("[CatalogueClient] DECREMENT - Status: " + response.getStatusCode());
+            System.out.println("[CatalogueClient] DECREMENT - Response body: " + response.getBody());
+            
+            boolean success = response.getStatusCode().is2xxSuccessful();
+            System.out.println("[CatalogueClient] DECREMENT - Success: " + success);
+            
+            if (!success) {
+                System.err.println("[CatalogueClient] ERROR: Decrement returned non-2xx status: " + response.getStatusCode());
+            }
+            return success;
         } catch (Exception e) {
-            System.err.println("[CartService] Failed to decrement catalogue stock for product " + productId + ": " + e.getMessage());
+            System.err.println("[CatalogueClient] EXCEPTION during decrementStock for product " + productId);
+            System.err.println("[CatalogueClient] Exception type: " + e.getClass().getName());
+            System.err.println("[CatalogueClient] Exception message: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 }
+

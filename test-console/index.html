@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <header>
     <div class="header-inner">
       <div class="logo">SOA <span>Test Console</span></div>
@@ -19,26 +18,19 @@
       </div>
     </div>
   </header>
-
   <main>
-
     <nav class="sidebar">
       <p class="sidebar-label">Services</p>
       <button class="svc-btn active" data-target="catalogue">Catalogue <span class="port">:8082</span></button>
       <button class="svc-btn" data-target="cart">Cart <span class="port">:8083</span></button>
       <button class="svc-btn" data-target="payment">Payment <span class="port">:8084</span></button>
       <button class="svc-btn" data-target="warehouse">Warehouse <span class="port">:8086</span></button>
-
       <p class="sidebar-label" style="margin-top:2rem;">Quick flows</p>
       <button class="flow-btn" id="btn-full-flow">Full checkout flow</button>
     </nav>
-
     <section class="panels">
-
-      <!-- CATALOGUE -->
       <div class="panel active" id="panel-catalogue">
         <h2>Catalogue Service</h2>
-
         <div class="card">
           <h3>List products</h3>
           <div class="field-row">
@@ -47,7 +39,6 @@
             <button onclick="getProducts()">GET /products</button>
           </div>
         </div>
-
         <div class="card">
           <h3>Get single product</h3>
           <div class="field-row">
@@ -55,7 +46,6 @@
             <button onclick="getProduct()">GET /products/{id}</button>
           </div>
         </div>
-
         <div class="card">
           <h3>Create product</h3>
           <div class="field-row">
@@ -68,18 +58,14 @@
           </div>
         </div>
       </div>
-
-      <!-- CART -->
       <div class="panel" id="panel-cart">
         <h2>Cart Service</h2>
-
         <div class="card">
           <h3>View cart</h3>
           <div class="field-row">
             <button onclick="getCart()">GET /cart/{sessionId}</button>
           </div>
         </div>
-
         <div class="card">
           <h3>Add item <span class="badge">Sync → Catalogue</span></h3>
           <div class="field-row">
@@ -88,7 +74,6 @@
             <button onclick="addToCart()">POST /cart/{sessionId}/items</button>
           </div>
         </div>
-
         <div class="card">
           <h3>Remove item</h3>
           <div class="field-row">
@@ -96,7 +81,6 @@
             <button onclick="removeFromCart()">DELETE /cart/{sessionId}/items/{productId}</button>
           </div>
         </div>
-
         <div class="card">
           <h3>Checkout <span class="badge">Sync → Payment → Async → Warehouse</span></h3>
           <div class="field-row">
@@ -109,11 +93,8 @@
           </div>
         </div>
       </div>
-
-      <!-- PAYMENT -->
       <div class="panel" id="panel-payment">
         <h2>Payment Service</h2>
-
         <div class="card">
           <h3>Look up transaction</h3>
           <div class="field-row">
@@ -122,8 +103,6 @@
           </div>
         </div>
       </div>
-
-      <!-- WAREHOUSE -->
       <div class="panel" id="panel-warehouse">
         <h2>Warehouse Service</h2>
 
@@ -133,7 +112,6 @@
             <button onclick="getInventory()">GET /warehouse/inventory</button>
           </div>
         </div>
-
         <div class="card">
           <h3>Restock product</h3>
           <div class="field-row">
@@ -143,9 +121,7 @@
           </div>
         </div>
       </div>
-
     </section>
-
     <aside class="log-panel">
       <div class="log-header">
         <span>Response log</span>
@@ -153,15 +129,14 @@
       </div>
       <div id="log"></div>
     </aside>
-
   </main>
-
+  
   <script>
     const SERVICES = {
-      catalogue: 'http://localhost:8082',
-      cart:      'http://localhost:8083',
-      payment:   'http://localhost:8084',
-      warehouse: 'http://localhost:8086',
+      catalogue:'http://localhost:8082',
+      cart:'http://localhost:8083',
+      payment:'http://localhost:8084',
+      warehouse:'http://localhost:8086',
     };
 
     function sessionId() {
@@ -205,7 +180,7 @@
         log(method, url, res.status, data);
         return data;
       } catch (e) {
-        log(method, url, 0, { error: e.message + ' — is the service running?' });
+        log(method, url, 0, { error: e.message + 'Service not running' });
       }
     }
 

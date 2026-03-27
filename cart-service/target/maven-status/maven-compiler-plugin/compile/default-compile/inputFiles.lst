@@ -1,5 +1,6 @@
 /home/luisbfsousa/twente/SOAWS/milestone2/cart-service/src/main/java/com/ecommerce/cartservice/service/CatalogueClient.java
 /home/luisbfsousa/twente/SOAWS/milestone2/cart-service/src/main/java/com/ecommerce/cartservice/controller/CartController.java
+/home/luisbfsousa/twente/SOAWS/milestone2/cart-service/src/main/java/com/ecommerce/cartservice/config/RestTemplateConfig.java
 /home/luisbfsousa/twente/SOAWS/milestone2/cart-service/src/main/java/com/ecommerce/cartservice/service/CartItemRepository.java
 /home/luisbfsousa/twente/SOAWS/milestone2/cart-service/src/main/java/com/ecommerce/cartservice/service/WarehouseClient.java
 /home/luisbfsousa/twente/SOAWS/milestone2/cart-service/src/main/java/com/ecommerce/cartservice/service/PaymentClient.java
