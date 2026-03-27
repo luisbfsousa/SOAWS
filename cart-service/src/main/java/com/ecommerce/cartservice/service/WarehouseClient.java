@@ -29,24 +29,24 @@ public class WarehouseClient {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Integer>> entity = new HttpEntity<>(request, headers);
-            
+
             System.out.println("[WarehouseClient] DECREMENT - URL: " + url);
             System.out.println("[WarehouseClient] DECREMENT - Request: " + request);
             System.out.println("[WarehouseClient] DECREMENT - Sending PATCH request...");
-            
+
             var response = restTemplate.exchange(
                     url,
                     HttpMethod.PATCH,
                     entity,
                     Map.class
             );
-            
+
             System.out.println("[WarehouseClient] DECREMENT - Status: " + response.getStatusCode());
             System.out.println("[WarehouseClient] DECREMENT - Response body: " + response.getBody());
-            
+
             boolean success = response.getStatusCode().is2xxSuccessful();
             System.out.println("[WarehouseClient] DECREMENT - Success: " + success);
-            
+
             if (!success) {
                 System.err.println("[WarehouseClient] ERROR: Decrement returned non-2xx status: " + response.getStatusCode());
             }
@@ -67,7 +67,7 @@ public class WarehouseClient {
             System.out.println("[CartService] Fetching warehouse stock from: " + url);
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
             System.out.println("[CartService] Warehouse response for product " + productId + ": " + response);
-            
+
             if (response != null) {
                 Object stock = response.get("stock");
                 if (stock instanceof Number) {

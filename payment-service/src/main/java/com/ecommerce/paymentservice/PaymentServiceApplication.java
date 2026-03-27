@@ -8,14 +8,14 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
 @SpringBootApplication
-public class PaymentServiceApplication{
+public class PaymentServiceApplication {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         SpringApplication.run(PaymentServiceApplication.class, args);
     }
 
     @Bean
-    public MessageConverter jacksonJmsMessageConverter(){
+    public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");

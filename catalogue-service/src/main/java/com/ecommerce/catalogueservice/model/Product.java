@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "products")
-public class Product{
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,11 +15,11 @@ public class Product{
     private int stockQuantity;
     private Long warehouseId;
 
-    public Product(){
+    public Product() {
 
     }
 
-    public Product(String name, String category, double price, String description, int stockQuantity, Long warehouseId){
+    public Product(String name, String category, double price, String description, int stockQuantity, Long warehouseId) {
         this.name = name;
         this.category = category;
         this.price = price;
@@ -28,55 +28,55 @@ public class Product{
         this.warehouseId = warehouseId;
     }
 
-    public Long getId(){ 
-        return id; 
-    }
-    
-    public String getName(){
-        return name; 
+    public Long getId() {
+        return id;
     }
 
-    public void setName(String name){ 
-        this.name = name; 
+    public String getName() {
+        return name;
     }
 
-    public String getCategory(){ 
-        return category; 
+    public void setName(String name) {
+        this.name = name;
     }
-    
-    public void setCategory(String category){ 
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
         this.category = category;
     }
 
-    public double getPrice(){ 
-        return price; 
+    public double getPrice() {
+        return price;
     }
 
-    public void setPrice(double price){ 
-        this.price = price; 
+    public void setPrice(double price) {
+        this.price = price;
     }
 
-    public String getDescription(){ 
-        return description; 
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescription(String description){ 
-        this.description = description; 
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public int getStockQuantity(){ 
-        return stockQuantity; 
+    public int getStockQuantity() {
+        return stockQuantity;
     }
 
-    public void setStockQuantity(int stockQuantity){ 
-        this.stockQuantity = stockQuantity; 
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
     }
 
-    public Long getWarehouseId(){ 
-        return warehouseId; 
+    public Long getWarehouseId() {
+        return warehouseId;
     }
 
-    public void setWarehouseId(Long warehouseId){ 
-        this.warehouseId = warehouseId; 
+    public void setWarehouseId(Long warehouseId) {
+        this.warehouseId = warehouseId;
     }
 }

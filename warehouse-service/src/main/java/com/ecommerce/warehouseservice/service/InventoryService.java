@@ -8,11 +8,11 @@ import java.util.Map;
 @Service
 public class InventoryService {
     private final Map<Long, Integer> inventory = new HashMap<>(Map.of(
-        1L, 100,
-        2L, 50,
-        3L, 30,
-        4L, 40,
-        5L, 0
+            1L, 100,
+            2L, 50,
+            3L, 30,
+            4L, 40,
+            5L, 0
     ));
 
     public Map<Long, Integer> getInventory() {

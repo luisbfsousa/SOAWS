@@ -10,14 +10,14 @@ import org.springframework.jms.support.converter.MessageType;
 
 @SpringBootApplication
 @EnableJms
-public class WarehouseServiceApplication{
+public class WarehouseServiceApplication {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         SpringApplication.run(WarehouseServiceApplication.class, args);
     }
 
     @Bean
-    public MessageConverter jacksonJmsMessageConverter(){
+    public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");

@@ -2,51 +2,52 @@ package com.ecommerce.paymentservice.model;
 
 import java.io.Serializable;
 
-public class OrderMessage implements Serializable{
+public class OrderMessage implements Serializable {
     private String transactionId;
     private String sessionId;
     private double totalAmount;
     private String customerAddress;
-    public OrderMessage(){
+
+    public OrderMessage() {
 
     }
 
-    public OrderMessage(String transactionId, String sessionId, double totalAmount, String customerAddress){
+    public OrderMessage(String transactionId, String sessionId, double totalAmount, String customerAddress) {
         this.transactionId = transactionId;
         this.sessionId = sessionId;
         this.totalAmount = totalAmount;
         this.customerAddress = customerAddress;
     }
 
-    public String getTransactionId(){ 
+    public String getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(String transactionId){ 
+    public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
     }
 
-    public String getSessionId(){ 
+    public String getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(String sessionId){ 
+    public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
 
-    public double getTotalAmount(){ 
+    public double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount){ 
+    public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    public String getCustomerAddress(){ 
+    public String getCustomerAddress() {
         return customerAddress;
     }
 
-    public void setCustomerAddress(String customerAddress){ 
+    public void setCustomerAddress(String customerAddress) {
         this.customerAddress = customerAddress;
     }
 }

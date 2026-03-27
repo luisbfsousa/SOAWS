@@ -46,24 +46,24 @@ public class CatalogueClient {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Integer>> entity = new HttpEntity<>(request, headers);
-            
+
             System.out.println("[CatalogueClient] DECREMENT - URL: " + url);
             System.out.println("[CatalogueClient] DECREMENT - Request: " + request);
             System.out.println("[CatalogueClient] DECREMENT - Sending PATCH request...");
-            
+
             var response = restTemplate.exchange(
                     url,
                     HttpMethod.PATCH,
                     entity,
                     Map.class
             );
-            
+
             System.out.println("[CatalogueClient] DECREMENT - Status: " + response.getStatusCode());
             System.out.println("[CatalogueClient] DECREMENT - Response body: " + response.getBody());
-            
+
             boolean success = response.getStatusCode().is2xxSuccessful();
             System.out.println("[CatalogueClient] DECREMENT - Success: " + success);
-            
+
             if (!success) {
                 System.err.println("[CatalogueClient] ERROR: Decrement returned non-2xx status: " + response.getStatusCode());
             }

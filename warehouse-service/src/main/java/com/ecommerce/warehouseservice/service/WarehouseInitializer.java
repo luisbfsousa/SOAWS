@@ -24,23 +24,23 @@ public class WarehouseInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Thread.sleep(2000);
-        
+
         try {
             System.out.println("[WarehouseService] Syncing initial products from catalogue...");
-            
+
             List<Map<String, Object>> products = restTemplate.getForObject(CATALOGUE_URL, List.class);
-            
+
             if (products != null && !products.isEmpty()) {
                 int count = 0;
                 for (Map<String, Object> product : products) {
                     try {
                         Object idObj = product.get("id");
                         Object stockObj = product.get("stockQuantity");
-                        
+
                         if (idObj != null && stockObj != null) {
                             Long productId = ((Number) idObj).longValue();
                             int stock = ((Number) stockObj).intValue();
-                            
+
                             if (inventoryService.getStock(productId) == null) {
                                 inventoryService.addOrUpdateProduct(productId, stock);
                                 System.out.println("[WarehouseService] Synced product " + productId + " with stock: " + stock);

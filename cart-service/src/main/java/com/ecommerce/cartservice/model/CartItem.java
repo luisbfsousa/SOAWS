@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "cart_items")
-public class CartItem{
+public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,8 +14,8 @@ public class CartItem{
     private double productPrice;
     private int quantity;
 
-    public CartItem(){
-        
+    public CartItem() {
+
     }
 
     public CartItem(String sessionId, Long productId, String productName, double productPrice, int quantity) {
@@ -26,47 +26,47 @@ public class CartItem{
         this.quantity = quantity;
     }
 
-    public Long getId(){ 
-        return id; 
+    public Long getId() {
+        return id;
     }
 
-    public String getSessionId(){ 
-        return sessionId; 
+    public String getSessionId() {
+        return sessionId;
     }
 
-    public void setSessionId(String sessionId){ 
-        this.sessionId = sessionId; 
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
-    public Long getProductId(){ 
-        return productId; 
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setProductId(Long productId){ 
-        this.productId = productId; 
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
-    public String getProductName(){ 
-        return productName; 
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProductName(String productName){ 
-        this.productName = productName; 
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
-    public double getProductPrice(){ 
-        return productPrice; 
+    public double getProductPrice() {
+        return productPrice;
     }
 
-    public void setProductPrice(double productPrice){ 
-        this.productPrice = productPrice; 
+    public void setProductPrice(double productPrice) {
+        this.productPrice = productPrice;
     }
 
-    public int getQuantity(){ 
-        return quantity; 
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setQuantity(int quantity){ 
-        this.quantity = quantity; 
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }
