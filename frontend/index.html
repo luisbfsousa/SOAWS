@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>THREAD — Clothing Store</title>
+  <title>SOAWS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="store.css" />
@@ -83,29 +83,14 @@
       <a href="#" onclick="filterCat('footwear')">Footwear</a>
       <a href="#" onclick="filterCat('accessories')">Accessories</a>
     </nav>
-    <div class="logo">THREAD</div>
+    <div class="logo"></div>
     <div class="nav-right">
-      <div class="search-wrap">
-        <input id="search-input" type="text" placeholder="Search…" oninput="searchProducts(this.value)" />
-      </div>
+      <input id="search-input" type="text" placeholder="Search…" oninput="searchProducts(this.value)" />
       <button class="bag-btn" onclick="openCart()">
         Bag <span id="bag-count" class="bag-count">0</span>
       </button>
     </div>
   </header>
-
-  <section class="hero">
-    <div class="hero-text">
-      <p class="hero-sub">New collection</p>
-      <h1>Wear what<br/><em>matters.</em></h1>
-      <button class="hero-btn" onclick="filterCat('')">Shop now</button>
-    </div>
-    <div class="hero-shapes">
-      <div class="shape s1"></div>
-      <div class="shape s2"></div>
-      <div class="shape s3"></div>
-    </div>
-  </section>
 
   <section class="products-section">
     <div class="section-header">
@@ -117,11 +102,6 @@
       <p>No products found.</p>
     </div>
   </section>
-
-  <footer>
-    <div class="footer-brand">THREAD</div>
-    <p>A service-oriented e-commerce platform.</p>
-  </footer>
 
   <script>
     const CATALOGUE = 'http://localhost:8082';
@@ -170,7 +150,7 @@
       }
       empty.classList.add('hidden');
 
-      const colors = ['#e8d5c4','#c4d5e8','#d5e8c4','#e8c4d5','#d5c4e8','#e8e4c4'];
+      const colors = ['#3d5a4a','#3d4a5a','#4a5a3d','#5a3d4a','#4a3d5a','#5a5a3d'];
       grid.innerHTML = products.map(p => {
         const inStock = p.stockQuantity > 0;
         const bg = colors[p.id % colors.length];
@@ -248,7 +228,7 @@
         return;
       }
 
-      const colors = ['#e8d5c4','#c4d5e8','#d5e8c4','#e8c4d5','#d5c4e8','#e8e4c4'];
+      const colors = ['#3d5a4a','#3d4a5a','#4a5a3d','#5a3d4a','#4a3d5a','#5a5a3d'];
       container.innerHTML = items.map(item => `
         <div class="cart-item">
           <div class="cart-item-color" style="background:${colors[item.productId % 6]}">
