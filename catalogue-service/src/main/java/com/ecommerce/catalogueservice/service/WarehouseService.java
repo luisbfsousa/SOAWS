@@ -38,4 +38,27 @@ public class WarehouseService {
             e.printStackTrace();
         }
     }
+
+    public Integer getStockFromWarehouse(Long productId) {
+        if (productId == null) {
+            System.err.println("[CatalogueService] Cannot fetch stock: productId is null");
+            return null;
+        }
+        
+        try {
+            String url = WAREHOUSE_URL + "/" + productId;
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            if (response != null && response.containsKey("stock")) {
+                Object stockObj = response.get("stock");
+                if (stockObj instanceof Number) {
+                    return ((Number) stockObj).intValue();
+                }
+            }
+        } catch (RestClientException e) {
+            System.err.println("[CatalogueService] Failed to fetch stock for product " + productId + " from warehouse: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("[CatalogueService] Unexpected error fetching stock for product " + productId + ": " + e.getMessage());
+        }
+        return null;
+    }
 }

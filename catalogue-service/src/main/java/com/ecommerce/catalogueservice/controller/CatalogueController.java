@@ -27,18 +27,24 @@ public class CatalogueController{
     public List<Product> getAllProducts(
         @RequestParam(required = false) String category,
         @RequestParam(required = false) String search){
+            List<Product> products;
             if(category != null){
-                return productRepository.findByCategory(category); 
+                products = productRepository.findByCategory(category); 
+            } else if(search != null){
+                products = productRepository.findByNameContainingIgnoreCase(search);
+            } else {
+                products = productRepository.findAll();
             }
-            if(search != null){
-                return productRepository.findByNameContainingIgnoreCase(search);
-            }
-        return productRepository.findAll();
+            enrichProductsWithLiveStock(products);
+            return products;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProduct(@PathVariable Long id){
-        return productRepository.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return productRepository.findById(id).map(product -> {
+            enrichProductWithLiveStock(product);
+            return ResponseEntity.ok(product);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -76,7 +82,7 @@ public class CatalogueController{
             deltaValue = Integer.parseInt((String) deltaObj);
         }
         
-        final int delta = deltaValue; // Make it final for lambda capture
+        final int delta = deltaValue; 
         System.out.println("[CatalogueService] Updating stock for product " + id + " with delta: " + delta);
         return productRepository.findById(id).map(p -> {
             int newStock = Math.max(0, p.getStockQuantity() + delta);
@@ -94,5 +100,20 @@ public class CatalogueController{
         } 
         productRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void enrichProductWithLiveStock(Product product) {
+        if (product == null) return;
+        Integer liveStock = warehouseService.getStockFromWarehouse(product.getId());
+        if (liveStock != null) {
+            product.setStockQuantity(liveStock);
+        }
+    }
+
+    private void enrichProductsWithLiveStock(List<Product> products) {
+        if (products == null) return;
+        for (Product product : products) {
+            enrichProductWithLiveStock(product);
+        }
     }
 }

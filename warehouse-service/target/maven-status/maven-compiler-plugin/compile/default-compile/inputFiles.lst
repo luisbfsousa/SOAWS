@@ -1,7 +1,7 @@
-/home/luisbfsousa/twente/SOAWS/milestone2/warehouse-service/src/main/java/com/ecommerce/warehouseservice/config/RestTemplateConfig.java
-/home/luisbfsousa/twente/SOAWS/milestone2/warehouse-service/src/main/java/com/ecommerce/warehouseservice/service/WarehouseInitializer.java
-/home/luisbfsousa/twente/SOAWS/milestone2/warehouse-service/src/main/java/com/ecommerce/warehouseservice/service/OrderListener.java
-/home/luisbfsousa/twente/SOAWS/milestone2/warehouse-service/src/main/java/com/ecommerce/warehouseservice/controller/WarehouseController.java
-/home/luisbfsousa/twente/SOAWS/milestone2/warehouse-service/src/main/java/com/ecommerce/warehouseservice/WarehouseServiceApplication.java
-/home/luisbfsousa/twente/SOAWS/milestone2/warehouse-service/src/main/java/com/ecommerce/warehouseservice/model/ShipmentMessage.java
-/home/luisbfsousa/twente/SOAWS/milestone2/warehouse-service/src/main/java/com/ecommerce/warehouseservice/service/InventoryService.java
+/home/luisbfsousa/SOAWS/warehouse-service/src/main/java/com/ecommerce/warehouseservice/service/OrderListener.java
+/home/luisbfsousa/SOAWS/warehouse-service/src/main/java/com/ecommerce/warehouseservice/controller/WarehouseController.java
+/home/luisbfsousa/SOAWS/warehouse-service/src/main/java/com/ecommerce/warehouseservice/model/ShipmentMessage.java
+/home/luisbfsousa/SOAWS/warehouse-service/src/main/java/com/ecommerce/warehouseservice/service/WarehouseInitializer.java
+/home/luisbfsousa/SOAWS/warehouse-service/src/main/java/com/ecommerce/warehouseservice/WarehouseServiceApplication.java
+/home/luisbfsousa/SOAWS/warehouse-service/src/main/java/com/ecommerce/warehouseservice/config/RestTemplateConfig.java
+/home/luisbfsousa/SOAWS/warehouse-service/src/main/java/com/ecommerce/warehouseservice/service/InventoryService.java

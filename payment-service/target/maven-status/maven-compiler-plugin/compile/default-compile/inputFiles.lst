@@ -1,5 +1,5 @@
-/home/luisbfsousa/twente/SOAWS/milestone2/payment-service/src/main/java/com/ecommerce/paymentservice/model/OrderMessage.java
-/home/luisbfsousa/twente/SOAWS/milestone2/payment-service/src/main/java/com/ecommerce/paymentservice/controller/PaymentController.java
-/home/luisbfsousa/twente/SOAWS/milestone2/payment-service/src/main/java/com/ecommerce/paymentservice/PaymentServiceApplication.java
-/home/luisbfsousa/twente/SOAWS/milestone2/payment-service/src/main/java/com/ecommerce/paymentservice/model/Payment.java
-/home/luisbfsousa/twente/SOAWS/milestone2/payment-service/src/main/java/com/ecommerce/paymentservice/service/PaymentRepository.java
+/home/luisbfsousa/SOAWS/payment-service/src/main/java/com/ecommerce/paymentservice/PaymentServiceApplication.java
+/home/luisbfsousa/SOAWS/payment-service/src/main/java/com/ecommerce/paymentservice/model/Payment.java
+/home/luisbfsousa/SOAWS/payment-service/src/main/java/com/ecommerce/paymentservice/service/PaymentRepository.java
+/home/luisbfsousa/SOAWS/payment-service/src/main/java/com/ecommerce/paymentservice/controller/PaymentController.java
+/home/luisbfsousa/SOAWS/payment-service/src/main/java/com/ecommerce/paymentservice/model/OrderMessage.java

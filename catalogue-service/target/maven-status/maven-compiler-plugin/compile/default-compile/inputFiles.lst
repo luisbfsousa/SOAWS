@@ -1,7 +1,7 @@
-/home/luisbfsousa/twente/SOAWS/milestone2/catalogue-service/src/main/java/com/ecommerce/catalogueservice/service/ProductRepository.java
-/home/luisbfsousa/twente/SOAWS/milestone2/catalogue-service/src/main/java/com/ecommerce/catalogueservice/service/WarehouseService.java
-/home/luisbfsousa/twente/SOAWS/milestone2/catalogue-service/src/main/java/com/ecommerce/catalogueservice/model/Product.java
-/home/luisbfsousa/twente/SOAWS/milestone2/catalogue-service/src/main/java/com/ecommerce/catalogueservice/CatalogueServiceApplication.java
-/home/luisbfsousa/twente/SOAWS/milestone2/catalogue-service/src/main/java/com/ecommerce/catalogueservice/controller/CatalogueController.java
-/home/luisbfsousa/twente/SOAWS/milestone2/catalogue-service/src/main/java/com/ecommerce/catalogueservice/config/RestTemplateConfig.java
-/home/luisbfsousa/twente/SOAWS/milestone2/catalogue-service/src/main/java/com/ecommerce/catalogueservice/service/DataInitializer.java
+/home/luisbfsousa/SOAWS/catalogue-service/src/main/java/com/ecommerce/catalogueservice/service/ProductRepository.java
+/home/luisbfsousa/SOAWS/catalogue-service/src/main/java/com/ecommerce/catalogueservice/service/DataInitializer.java
+/home/luisbfsousa/SOAWS/catalogue-service/src/main/java/com/ecommerce/catalogueservice/service/WarehouseService.java
+/home/luisbfsousa/SOAWS/catalogue-service/src/main/java/com/ecommerce/catalogueservice/model/Product.java
+/home/luisbfsousa/SOAWS/catalogue-service/src/main/java/com/ecommerce/catalogueservice/config/RestTemplateConfig.java
+/home/luisbfsousa/SOAWS/catalogue-service/src/main/java/com/ecommerce/catalogueservice/CatalogueServiceApplication.java
+/home/luisbfsousa/SOAWS/catalogue-service/src/main/java/com/ecommerce/catalogueservice/controller/CatalogueController.java
