@@ -3,167 +3,126 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SOA Test Console</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <title>Test Console</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <div class="header-inner">
-      <div class="logo">SOA <span>Test Console</span></div>
-      <div class="session-row">
-        <label>Session ID</label>
-        <input id="session-id" type="text" value="session-001" />
-      </div>
+    <h1></h1>
+    <div>
+      <label></label>
+      <input id="session-id" type="text" value="session-001" />
     </div>
   </header>
+
   <main>
-    <nav class="sidebar">
-      <p class="sidebar-label">Services</p>
-      <button class="svc-btn active" data-target="catalogue">Catalogue <span class="port">:8082</span></button>
-      <button class="svc-btn" data-target="cart">Cart <span class="port">:8083</span></button>
-      <button class="svc-btn" data-target="payment">Payment <span class="port">:8084</span></button>
-      <button class="svc-btn" data-target="warehouse">Warehouse <span class="port">:8086</span></button>
-      <p class="sidebar-label" style="margin-top:2rem;">Quick flows</p>
-      <button class="flow-btn" id="btn-full-flow">Full checkout flow</button>
-    </nav>
-    <section class="panels">
-      <div class="panel active" id="panel-catalogue">
-        <h2>Catalogue Service</h2>
-        <div class="card">
-          <h3>List products</h3>
-          <div class="field-row">
+      <nav class="sidebar">
+        <h3>Services</h3>
+        <button onclick="switchService('catalogue')" class="active">Catalogue (8082)</button>
+        <button onclick="switchService('cart')">Cart (8083)</button>
+        <button onclick="switchService('payment')">Payment (8084)</button>
+        <button onclick="switchService('warehouse')">Warehouse (8086)</button>
+      </nav>
+
+      <section class="content">
+        <div id="catalogue" class="panel active">
+          <h2>Catalogue Service</h2>
+          <div class="form-group">
             <input id="cat-category" type="text" placeholder="category (optional)" />
-            <input id="cat-search" type="text" placeholder="search name (optional)" />
+            <input id="cat-search" type="text" placeholder="search (optional)" />
             <button onclick="getProducts()">GET /products</button>
           </div>
-        </div>
-        <div class="card">
-          <h3>Get single product</h3>
-          <div class="field-row">
+          <div class="form-group">
             <input id="cat-id" type="number" placeholder="product id" value="1" />
             <button onclick="getProduct()">GET /products/{id}</button>
           </div>
-        </div>
-        <div class="card">
-          <h3>Create product</h3>
-          <div class="field-row">
-            <input id="new-name" type="text" placeholder="name" value="Linen Shirt" />
-            <input id="new-cat" type="text" placeholder="category" value="tops" />
-            <input id="new-price" type="number" placeholder="price" value="34.99" />
-            <input id="new-stock" type="number" placeholder="stock" value="20" />
-            <input id="new-warehouse" type="number" placeholder="warehouseId" value="1" />
+          <div class="form-group">
+            <input id="new-name" type="text" placeholder="name" />
+            <input id="new-cat" type="text" placeholder="category" />
+            <input id="new-price" type="number" placeholder="price" />
+            <input id="new-stock" type="number" placeholder="stock" />
             <button onclick="createProduct()">POST /products</button>
           </div>
         </div>
-      </div>
-      <div class="panel" id="panel-cart">
-        <h2>Cart Service</h2>
-        <div class="card">
-          <h3>View cart</h3>
-          <div class="field-row">
-            <button onclick="getCart()">GET /cart/{sessionId}</button>
+
+        <div id="cart" class="panel">
+          <h2>Cart Service</h2>
+          <div class="form-group">
+            <button onclick="getCart()">GET /cart</button>
           </div>
-        </div>
-        <div class="card">
-          <h3>Add item <span class="badge">Sync → Catalogue</span></h3>
-          <div class="field-row">
+          <div class="form-group">
             <input id="cart-product-id" type="number" placeholder="productId" value="1" />
             <input id="cart-qty" type="number" placeholder="quantity" value="1" />
-            <button onclick="addToCart()">POST /cart/{sessionId}/items</button>
+            <button onclick="addToCart()">POST /cart/items</button>
           </div>
-        </div>
-        <div class="card">
-          <h3>Remove item</h3>
-          <div class="field-row">
+          <div class="form-group">
             <input id="remove-product-id" type="number" placeholder="productId" value="1" />
-            <button onclick="removeFromCart()">DELETE /cart/{sessionId}/items/{productId}</button>
+            <button onclick="removeFromCart()">DELETE /cart/items</button>
           </div>
-        </div>
-        <div class="card">
-          <h3>Checkout <span class="badge">Sync → Payment → Async → Warehouse</span></h3>
-          <div class="field-row">
-            <input id="checkout-address" type="text" placeholder="address" value="Enschede, NL" />
+          <div class="form-group">
+            <input id="checkout-address" type="text" placeholder="address" />
             <select id="checkout-payment">
               <option value="card">card</option>
               <option value="paypal">paypal</option>
             </select>
-            <button onclick="checkout()">POST /cart/{sessionId}/checkout</button>
+            <button onclick="checkout()">POST /checkout</button>
           </div>
         </div>
-      </div>
-      <div class="panel" id="panel-payment">
-        <h2>Payment Service</h2>
-        <div class="card">
-          <h3>Look up transaction</h3>
-          <div class="field-row">
-            <input id="txn-id" type="text" placeholder="transactionId" />
-            <button onclick="getPayment()">GET /payments/{transactionId}</button>
-          </div>
-        </div>
-      </div>
-      <div class="panel" id="panel-warehouse">
-        <h2>Warehouse Service</h2>
 
-        <div class="card">
-          <h3>View inventory <span class="badge">Async consumer</span></h3>
-          <div class="field-row">
-            <button onclick="getInventory()">GET /warehouse/inventory</button>
+        <div id="payment" class="panel">
+          <h2>Payment Service</h2>
+          <div class="form-group">
+            <input id="txn-id" type="text" placeholder="transactionId" />
+            <button onclick="getPayment()">GET /payments/{id}</button>
           </div>
         </div>
-        <div class="card">
-          <h3>Restock product</h3>
-          <div class="field-row">
+
+        <div id="warehouse" class="panel">
+          <h2>Warehouse Service</h2>
+          <div class="form-group">
+            <button onclick="getInventory()">GET /inventory</button>
+          </div>
+          <div class="form-group">
             <input id="restock-id" type="number" placeholder="productId" value="1" />
             <input id="restock-qty" type="number" placeholder="quantity to add" value="50" />
-            <button onclick="restock()">PATCH /warehouse/inventory/{productId}</button>
+            <button onclick="restock()">PATCH /inventory</button>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
     <aside class="log-panel">
       <div class="log-header">
-        <span>Response log</span>
-        <button class="clear-btn" onclick="clearLog()">Clear</button>
+        <span>Responses</span>
+        <button onclick="clearLog()">Clear</button>
       </div>
       <div id="log"></div>
     </aside>
   </main>
-  
+
   <script>
     const SERVICES = {
-      catalogue:'http://localhost:8082',
-      cart:'http://localhost:8083',
-      payment:'http://localhost:8084',
-      warehouse:'http://localhost:8086',
+      catalogue: 'http://localhost:8082',
+      cart: 'http://localhost:8083',
+      payment: 'http://localhost:8084',
+      warehouse: 'http://localhost:8086',
     };
 
     function sessionId() {
       return document.getElementById('session-id').value.trim() || 'session-001';
     }
 
-    document.querySelectorAll('.svc-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.svc-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('panel-' + btn.dataset.target).classList.add('active');
-      });
-    });
+    function switchService(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById(name).classList.add('active');
+      event.target.classList.add('active');
+    }
 
     function log(method, url, status, body) {
       const el = document.getElementById('log');
       const entry = document.createElement('div');
-      entry.className = 'log-entry';
-      const isOk = status >= 200 && status < 300;
-      entry.innerHTML = `
-        <div class="log-meta">
-          <span class="log-method">${method}</span>
-          <span class="log-url">${url}</span>
-          <span class="log-status ${isOk ? 'ok' : 'err'}">${status}</span>
-        </div>
-        <pre class="log-body">${JSON.stringify(body, null, 2)}</pre>`;
+      entry.className = `log-entry ${status >= 200 && status < 300 ? 'ok' : 'err'}`;
+      entry.innerHTML = `<strong>${method} ${url}</strong> [${status}]<pre>${JSON.stringify(body, null, 2)}</pre>`;
       el.prepend(entry);
     }
 
@@ -178,18 +137,17 @@
         const res = await fetch(url, opts);
         const data = await res.json().catch(() => ({}));
         log(method, url, res.status, data);
-        return data;
       } catch (e) {
-        log(method, url, 0, { error: e.message + 'Service not running' });
+        log(method, url, 0, { error: e.message });
       }
     }
 
     function getProducts() {
-      const cat    = document.getElementById('cat-category').value;
+      const cat = document.getElementById('cat-category').value;
       const search = document.getElementById('cat-search').value;
       let url = `${SERVICES.catalogue}/products`;
       const params = [];
-      if (cat)    params.push(`category=${encodeURIComponent(cat)}`);
+      if (cat) params.push(`category=${encodeURIComponent(cat)}`);
       if (search) params.push(`search=${encodeURIComponent(search)}`);
       if (params.length) url += '?' + params.join('&');
       req('GET', url);
@@ -201,20 +159,19 @@
 
     function createProduct() {
       req('POST', `${SERVICES.catalogue}/products`, {
-        name:          document.getElementById('new-name').value,
-        category:      document.getElementById('new-cat').value,
-        price:         parseFloat(document.getElementById('new-price').value),
+        name: document.getElementById('new-name').value,
+        category: document.getElementById('new-cat').value,
+        price: parseFloat(document.getElementById('new-price').value),
         stockQuantity: parseInt(document.getElementById('new-stock').value),
-        warehouseId:   parseInt(document.getElementById('new-warehouse').value),
       });
     }
 
-    function getCart()      { req('GET', `${SERVICES.cart}/cart/${sessionId()}`); }
+    function getCart() { req('GET', `${SERVICES.cart}/cart/${sessionId()}`); }
 
     function addToCart() {
       req('POST', `${SERVICES.cart}/cart/${sessionId()}/items`, {
         productId: parseInt(document.getElementById('cart-product-id').value),
-        quantity:  parseInt(document.getElementById('cart-qty').value),
+        quantity: parseInt(document.getElementById('cart-qty').value),
       });
     }
 
@@ -224,7 +181,7 @@
 
     function checkout() {
       req('POST', `${SERVICES.cart}/cart/${sessionId()}/checkout`, {
-        address:       document.getElementById('checkout-address').value,
+        address: document.getElementById('checkout-address').value,
         paymentMethod: document.getElementById('checkout-payment').value,
       });
     }
@@ -240,17 +197,6 @@
         quantity: parseInt(document.getElementById('restock-qty').value),
       });
     }
-
-    document.getElementById('btn-full-flow').addEventListener('click', async () => {
-      const sid = sessionId();
-      log('INFO', '--- Full checkout flow ---', 200, { sessionId: sid });
-      await req('POST', `${SERVICES.cart}/cart/${sid}/items`, { productId: 1, quantity: 1 });
-      await req('POST', `${SERVICES.cart}/cart/${sid}/items`, { productId: 2, quantity: 1 });
-      await req('GET',  `${SERVICES.cart}/cart/${sid}`);
-      await req('POST', `${SERVICES.cart}/cart/${sid}/checkout`, {
-        address: 'Enschede, NL', paymentMethod: 'card'
-      });
-    });
   </script>
 </body>
 </html>
