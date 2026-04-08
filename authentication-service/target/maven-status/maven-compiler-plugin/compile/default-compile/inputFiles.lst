@@ -1,0 +1,9 @@
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/datatransfer/RegisterRequest.java
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/service/AuthService.java
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/datatransfer/AuthRequest.java
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/AuthenticationServiceApplication.java
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/controller/AuthController.java
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/repository/UserRepository.java
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/datatransfer/AuthResponse.java
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/model/User.java
+/home/luisbfsousa/SOAWS/authentication-service/src/main/java/com/ecommerce/model/UserRole.java

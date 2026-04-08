@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.ecommerce.paymentservice.model.OrderMessage;
 import com.ecommerce.paymentservice.model.Payment;
 import com.ecommerce.paymentservice.service.PaymentRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,12 @@ public class PaymentController {
 public static final String ORDER_QUEUE = "order.confirmed";
     private final PaymentRepository paymentRepository;
     private final JmsTemplate jmsTemplate;
+    private final ObjectMapper objectMapper;
 
-    public PaymentController(PaymentRepository paymentRepository, JmsTemplate jmsTemplate) {
+    public PaymentController(PaymentRepository paymentRepository, JmsTemplate jmsTemplate, ObjectMapper objectMapper) {
         this.paymentRepository = paymentRepository;
         this.jmsTemplate = jmsTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping
@@ -46,9 +49,20 @@ public static final String ORDER_QUEUE = "order.confirmed";
             return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Invalid payment amount"));
         }
 
-        OrderMessage orderMessage = new OrderMessage(transactionId, sessionId, amount, customerAddress);
-        jmsTemplate.convertAndSend(ORDER_QUEUE, orderMessage);
-        log.info("Published to queue: {}", transactionId);
+        try {
+            Map<String, Object> orderData = Map.of(
+                    "transactionId", transactionId,
+                    "sessionId", sessionId,
+                    "amount", amount,
+                    "customerAddress", customerAddress
+            );
+            String orderJson = objectMapper.writeValueAsString(orderData);
+            jmsTemplate.convertAndSend(ORDER_QUEUE, orderJson);
+            log.info("Published to queue: {}", transactionId);
+        } catch (Exception e) {
+            log.error("Failed to send order message: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to send order to queue", e);
+        }
 
         return ResponseEntity.ok(Map.of(
                 "success", true,

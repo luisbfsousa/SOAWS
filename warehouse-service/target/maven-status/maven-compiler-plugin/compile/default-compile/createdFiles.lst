@@ -4,4 +4,6 @@ com/ecommerce/warehouseservice/WarehouseServiceApplication.class
 com/ecommerce/warehouseservice/service/OrderListener.class
 com/ecommerce/warehouseservice/controller/WarehouseController.class
 com/ecommerce/warehouseservice/service/WarehouseInitializer.class
+com/ecommerce/warehouseservice/service/OrderListener$1.class
 com/ecommerce/warehouseservice/service/InventoryService.class
+com/ecommerce/warehouseservice/service/WarehouseInitializer$1.class

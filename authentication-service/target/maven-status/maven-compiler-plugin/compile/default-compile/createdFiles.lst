@@ -1,0 +1,11 @@
+com/ecommerce/datatransfer/AuthResponse$AuthResponseBuilder.class
+com/ecommerce/datatransfer/RegisterRequest.class
+com/ecommerce/model/UserRole.class
+com/ecommerce/datatransfer/AuthRequest.class
+com/ecommerce/model/User$UserBuilder.class
+com/ecommerce/AuthenticationServiceApplication.class
+com/ecommerce/datatransfer/AuthResponse.class
+com/ecommerce/model/User.class
+com/ecommerce/controller/AuthController.class
+com/ecommerce/repository/UserRepository.class
+com/ecommerce/service/AuthService.class

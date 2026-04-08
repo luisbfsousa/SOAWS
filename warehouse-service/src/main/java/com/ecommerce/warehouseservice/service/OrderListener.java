@@ -46,7 +46,8 @@ public class OrderListener {
             jmsTemplate.convertAndSend(SHIPMENT_QUEUE, shipment);
             log.info("Order shipped. Tracking: {}", trackingCode);
         } catch (Exception e) {
-            log.error("Failed to process order message: {}", e.getMessage());
+            log.error("Failed to process order message: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to process order", e);
         }
     }
 }

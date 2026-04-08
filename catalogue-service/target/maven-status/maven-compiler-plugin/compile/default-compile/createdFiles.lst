@@ -2,6 +2,8 @@ com/ecommerce/catalogueservice/config/RestTemplateConfig.class
 com/ecommerce/catalogueservice/service/DataInitializer.class
 com/ecommerce/catalogueservice/service/WarehouseService.class
 com/ecommerce/catalogueservice/model/Product.class
+com/ecommerce/catalogueservice/service/WarehouseService$1.class
+com/ecommerce/catalogueservice/service/WarehouseService$2.class
 com/ecommerce/catalogueservice/CatalogueServiceApplication.class
 com/ecommerce/catalogueservice/controller/CatalogueController.class
 com/ecommerce/catalogueservice/service/ProductRepository.class
