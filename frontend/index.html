@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SOAWS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="store.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="store.css?v=2" />
 </head>
+
 <body>
 
   <div id="toast"></div>
@@ -75,6 +79,36 @@
     <button class="checkout-btn" onclick="closeSuccess()">Continue shopping</button>
   </div>
 
+  <div id="auth-overlay" onclick="closeAuth()"></div>
+  <div id="auth-modal">
+    <button class="close-btn modal-close" onclick="closeAuth()">✕</button>
+    <h2 id="auth-title">Welcome back</h2>
+    <p class="subtitle" id="auth-subtitle">Sign in to your account</p>
+    <div class="auth-form">
+      <div class="form-group">
+        <label>Username</label>
+        <input id="auth-user" type="text" placeholder="jane.doe" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input id="auth-pass" type="password" placeholder="••••••••" />
+      </div>
+      <div class="form-group" id="auth-role-group" style="display: none;">
+        <label>Role</label>
+        <select id="auth-role"
+          style="background:#252525; border:1px solid var(--border); border-radius:var(--radius); color:var(--dark); padding:10px 14px; font-family:var(--font-sans); font-size:14px; outline:none;">
+          <option value="CUSTOMER">Customer</option>
+          <option value="ADMINISTRATOR">Administrator</option>
+          <option value="WAREHOUSE_STAFF">Warehouse Staff</option>
+        </select>
+      </div>
+      <button class="checkout-btn" id="auth-submit-btn" onclick="submitAuth()">Sign In</button>
+    </div>
+    <div class="auth-switch" id="auth-switch">
+      Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>
+    </div>
+  </div>
+
   <header>
     <nav class="nav-left">
       <a href="#" onclick="filterCat('')">All</a>
@@ -86,6 +120,7 @@
     <div class="logo"></div>
     <div class="nav-right">
       <input id="search-input" type="text" placeholder="Search…" oninput="searchProducts(this.value)" />
+      <button class="auth-btn" id="auth-btn" onclick="openAuth()">Sign in</button>
       <button class="bag-btn" onclick="openCart()">
         Bag <span id="bag-count" class="bag-count">0</span>
       </button>
@@ -105,11 +140,100 @@
 
   <script>
     const CATALOGUE = 'http://localhost:8082';
-    const CART      = 'http://localhost:8083';
+    const CART = 'http://localhost:8083';
+    const AUTH = 'http://localhost:8087/api/auth';
 
     const SHIPPING_COST = 5.99;
     const SESSION = 'store-' + Math.random().toString(36).slice(2, 9);
     let cartItems = [];
+
+    let isLoginMode = true;
+    let currentUser = null;
+
+    function checkAuth() {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        document.getElementById('auth-btn').onclick = logout;
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          currentUser = payload;
+          document.getElementById('auth-btn').textContent = payload.sub || 'Sign out';
+        } catch (e) {
+          document.getElementById('auth-btn').textContent = 'Sign out';
+        }
+      } else {
+        document.getElementById('auth-btn').textContent = 'Sign in';
+        document.getElementById('auth-btn').onclick = openAuth;
+        currentUser = null;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('auth_token');
+      toast('Logged out');
+      checkAuth();
+    }
+
+    function openAuth() {
+      document.getElementById('auth-user').value = '';
+      document.getElementById('auth-pass').value = '';
+      document.getElementById('auth-overlay').classList.add('show');
+      document.getElementById('auth-modal').classList.add('open');
+    }
+
+    function closeAuth() {
+      document.getElementById('auth-overlay').classList.remove('show');
+      document.getElementById('auth-modal').classList.remove('open');
+    }
+
+    function toggleAuthMode() {
+      isLoginMode = !isLoginMode;
+      document.getElementById('auth-title').textContent = isLoginMode ? 'Welcome back' : 'Create account';
+      document.getElementById('auth-subtitle').textContent = isLoginMode ? 'Sign in to your account' : 'Join us to checkout quickly';
+      document.getElementById('auth-submit-btn').textContent = isLoginMode ? 'Sign In' : 'Sign Up';
+      document.getElementById('auth-switch').innerHTML = isLoginMode
+        ? `Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>`
+        : `Already have an account? <a onclick="toggleAuthMode()">Sign in</a>`;
+      document.getElementById('auth-role-group').style.display = isLoginMode ? 'none' : 'flex';
+    }
+
+    async function submitAuth() {
+      const user = document.getElementById('auth-user').value.trim();
+      const pass = document.getElementById('auth-pass').value;
+      const role = document.getElementById('auth-role').value;
+
+      if (!user || !pass) {
+        toast('Please fill all fields', 'err');
+        return;
+      }
+
+      document.getElementById('auth-submit-btn').disabled = true;
+
+      const url = isLoginMode ? `${AUTH}/login` : `${AUTH}/register`;
+      const payload = isLoginMode ? { username: user, password: pass } : { username: user, password: pass, role: role };
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          toast(data.message || 'Authentication failed', 'err');
+        } else {
+          localStorage.setItem('auth_token', data.token);
+          toast(`Welcome, ${data.username}!`);
+          closeAuth();
+          checkAuth();
+        }
+      } catch (e) {
+        toast('Could not reach auth service', 'err');
+      } finally {
+        document.getElementById('auth-submit-btn').disabled = false;
+      }
+    }
 
     function toast(msg, type = 'ok') {
       const el = document.getElementById('toast');
@@ -123,7 +247,7 @@
       let url = `${CATALOGUE}/products`;
       const params = [];
       if (category) params.push(`category=${encodeURIComponent(category)}`);
-      if (search)   params.push(`search=${encodeURIComponent(search)}`);
+      if (search) params.push(`search=${encodeURIComponent(search)}`);
       if (params.length) url += '?' + params.join('&');
       try {
         const res = await fetch(url);
@@ -135,7 +259,7 @@
     }
 
     function renderProducts(products, category, search) {
-      const grid  = document.getElementById('products-grid');
+      const grid = document.getElementById('products-grid');
       const empty = document.getElementById('empty-state');
       document.getElementById('section-title').textContent = category
         ? category.charAt(0).toUpperCase() + category.slice(1)
@@ -150,7 +274,7 @@
       }
       empty.classList.add('hidden');
 
-      const colors = ['#3d5a4a','#3d4a5a','#4a5a3d','#5a3d4a','#4a3d5a','#5a5a3d'];
+      const colors = ['#3d5a4a', '#3d4a5a', '#4a5a3d', '#5a3d4a', '#4a3d5a', '#5a5a3d'];
       grid.innerHTML = products.map(p => {
         const inStock = p.stockQuantity > 0;
         const bg = colors[p.id % colors.length];
@@ -160,7 +284,7 @@
             <div class="product-img" style="background:${bg}">
               <div class="product-initial">${p.name.charAt(0)}</div>
               ${!inStock ? '<div class="sold-out-badge">Sold out</div>' : ''}
-              ${inStock  ? '<div class="add-overlay">Add to bag</div>' : ''}
+              ${inStock ? '<div class="add-overlay">Add to bag</div>' : ''}
             </div>
             <div class="product-info">
               <p class="product-name">${p.name}</p>
@@ -209,17 +333,17 @@
         const data = await res.json();
         cartItems = data.items || [];
         renderCart(data);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     function renderCart(data) {
-      const items    = data.items || [];
+      const items = data.items || [];
       const subtotal = data.subtotal || 0;
-      const total    = subtotal + SHIPPING_COST;
-      const count    = items.reduce((s, i) => s + i.quantity, 0);
+      const total = subtotal + SHIPPING_COST;
+      const count = items.reduce((s, i) => s + i.quantity, 0);
 
       document.getElementById('cart-count').textContent = count;
-      document.getElementById('bag-count').textContent  = count;
+      document.getElementById('bag-count').textContent = count;
 
       const container = document.getElementById('cart-items');
       if (items.length === 0) {
@@ -228,7 +352,7 @@
         return;
       }
 
-      const colors = ['#3d5a4a','#3d4a5a','#4a5a3d','#5a3d4a','#4a3d5a','#5a5a3d'];
+      const colors = ['#3d5a4a', '#3d4a5a', '#4a5a3d', '#5a3d4a', '#4a3d5a', '#5a5a3d'];
       container.innerHTML = items.map(item => `
         <div class="cart-item">
           <div class="cart-item-color" style="background:${colors[item.productId % 6]}">
@@ -246,7 +370,7 @@
 
       document.getElementById('cart-footer').classList.remove('hidden');
       document.getElementById('cart-subtotal').textContent = `€${subtotal.toFixed(2)}`;
-      document.getElementById('cart-total').textContent    = `€${total.toFixed(2)}`;
+      document.getElementById('cart-total').textContent = `€${total.toFixed(2)}`;
     }
 
     async function removeItem(productId) {
@@ -282,7 +406,7 @@
 
     function renderOrderSummary() {
       const subtotal = cartItems.reduce((s, i) => s + i.productPrice * i.quantity, 0);
-      const total    = subtotal + SHIPPING_COST;
+      const total = subtotal + SHIPPING_COST;
       document.getElementById('order-summary-lines').innerHTML = `
         <div class="order-summary">
           ${cartItems.map(i => `
@@ -336,12 +460,14 @@
     async function closeSuccess() {
       document.getElementById('success-overlay').classList.remove('show');
       document.getElementById('success-modal').classList.remove('open');
-      await loadProducts(); 
+      await loadProducts();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     loadProducts();
     refreshCart();
+    checkAuth();
   </script>
 </body>
+
 </html>
