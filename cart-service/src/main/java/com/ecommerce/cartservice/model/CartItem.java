@@ -30,6 +30,10 @@ public class CartItem {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getSessionId() {
         return sessionId;
     }

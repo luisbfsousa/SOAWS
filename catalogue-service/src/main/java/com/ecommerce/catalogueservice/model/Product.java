@@ -79,4 +79,8 @@ public class Product {
     public void setWarehouseId(Long warehouseId) {
         this.warehouseId = warehouseId;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 }

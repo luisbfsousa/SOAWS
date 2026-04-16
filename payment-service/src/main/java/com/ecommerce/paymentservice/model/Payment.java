@@ -17,6 +17,15 @@ public class Payment{
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
     private LocalDateTime createdAt;
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setCreatedAt(LocalDateTime time) {
+        this.createdAt = time;
+    }
+
     public enum PaymentStatus {PENDING, SUCCESS, FAILED}
     public Payment() {
 

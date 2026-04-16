@@ -3,7 +3,6 @@ package com.ecommerce.paymentservice.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ecommerce.paymentservice.model.OrderMessage;
 import com.ecommerce.paymentservice.model.Payment;
 import com.ecommerce.paymentservice.service.PaymentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +18,7 @@ import java.util.UUID;
 @RequestMapping("/payments")
 public class PaymentController {
     private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
-public static final String ORDER_QUEUE = "order.confirmed";
+    public static final String ORDER_QUEUE = "order.confirmed";
     private final PaymentRepository paymentRepository;
     private final JmsTemplate jmsTemplate;
     private final ObjectMapper objectMapper;
