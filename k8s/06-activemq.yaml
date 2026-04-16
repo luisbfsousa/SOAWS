@@ -1,0 +1,68 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: activemq-config
+  namespace: ecommerce
+data:
+  ACTIVEMQ_ADMIN_LOGIN: "admin"
+  ACTIVEMQ_ADMIN_PASSWORD: "admin"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: activemq-service
+  namespace: ecommerce
+  labels:
+    app: activemq
+spec:
+  type: ClusterIP
+  ports:
+    - port: 61616
+      targetPort: 61616
+      protocol: TCP
+      name: openwire
+    - port: 8161
+      targetPort: 8161
+      protocol: TCP
+      name: web
+  selector:
+    app: activemq
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activemq
+  namespace: ecommerce
+  labels:
+    app: activemq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: activemq
+  template:
+    metadata:
+      labels:
+        app: activemq
+    spec:
+      containers:
+        - name: activemq
+          image: apache/activemq:latest
+          ports:
+            - containerPort: 61616
+              name: openwire
+            - containerPort: 8161
+              name: web
+          envFrom:
+            - configMapRef:
+                name: activemq-config
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"

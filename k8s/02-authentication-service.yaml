@@ -1,0 +1,68 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+  namespace: ecommerce
+data:
+  SPRING_DATASOURCE_URL: "jdbc:h2:mem:authdb"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  SPRING_APPLICATION_NAME: "authentication-service"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentication-service
+  namespace: ecommerce
+  labels:
+    app: authentication-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8087
+      targetPort: 8087
+      protocol: TCP
+      name: http
+  selector:
+    app: authentication-service
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service
+  namespace: ecommerce
+  labels:
+    app: authentication-service
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: authentication-service
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      containers:
+        - name: authentication-service
+          image: ecommerce/authentication-service:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8087
+          envFrom:
+            - configMapRef:
+                name: auth-config
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
