@@ -1,6 +1,5 @@
+com\ecommerce\paymentservice\model\Payment.class
 com\ecommerce\paymentservice\PaymentServiceApplication.class
 com\ecommerce\paymentservice\service\PaymentRepository.class
 com\ecommerce\paymentservice\controller\PaymentController.class
-com\ecommerce\paymentservice\model\OrderMessage.class
-com\ecommerce\paymentservice\model\Payment.class
 com\ecommerce\paymentservice\model\Payment$PaymentStatus.class

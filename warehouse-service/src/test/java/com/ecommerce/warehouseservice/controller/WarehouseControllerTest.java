@@ -76,7 +76,7 @@ class WarehouseControllerTest {
                 "stockQuantity", 9001
         );
 
-        doNothing().when(inventoryService).addOrUpdateProduct(9000L, 9001);
+        doNothing().when(inventoryService).putProduct(9000L, 9001);
 
         mockMvc.perform(post("/warehouse/inventory")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -85,7 +85,7 @@ class WarehouseControllerTest {
                 .andExpect(jsonPath("$.productId").value(9000))
                 .andExpect(jsonPath("$.stock").value(9001));
 
-        verify(inventoryService).addOrUpdateProduct(9000L, 9001);
+        verify(inventoryService).putProduct(9000L, 9001);
     }
 
     @Test

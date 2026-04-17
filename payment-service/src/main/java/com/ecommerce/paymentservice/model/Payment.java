@@ -48,7 +48,6 @@ public class Payment{
         return transactionId;
     }
 
-
     public String getSessionId(){ 
         return sessionId;
     }

@@ -48,7 +48,7 @@ private final InventoryService inventoryService;
         Long productId = ((Number) productIdObj).longValue();
         int stock = ((Number) stockObj).intValue();
 
-        inventoryService.addOrUpdateProduct(productId, stock);
+        inventoryService.putProduct(productId, stock);
         log.info("Added product {} to inventory with stock: {}", productId, stock);
         return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(
                 Map.of("productId", productId, "stock", stock)

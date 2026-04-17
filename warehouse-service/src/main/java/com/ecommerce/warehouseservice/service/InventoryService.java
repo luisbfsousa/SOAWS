@@ -23,7 +23,7 @@ public class InventoryService {
         return inventory.get(productId);
     }
 
-    public void addOrUpdateProduct(Long productId, int stock) {
+    public void putProduct(Long productId, int stock) {
         inventory.put(productId, Math.max(0, stock));
     }
 

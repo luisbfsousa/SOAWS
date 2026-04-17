@@ -39,14 +39,14 @@ public class CatalogueController {
         } else {
             products = productRepository.findAll();
         }
-        enrichProductsWithLiveStock(products);
+        addLiveStock(products);
         return products;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProduct(@PathVariable Long id) {
         return productRepository.findById(id).map(product -> {
-            enrichProductWithLiveStock(product);
+            addLiveStock(product);
             return ResponseEntity.ok(product);
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -105,7 +105,7 @@ public class CatalogueController {
         return ResponseEntity.noContent().build();
     }
 
-    private void enrichProductWithLiveStock(Product product) {
+    private void addLiveStock(Product product) {
         if (product == null) return;
         Integer liveStock = warehouseService.getStockFromWarehouse(product.getId());
         if (liveStock != null) {
@@ -113,10 +113,10 @@ public class CatalogueController {
         }
     }
 
-    private void enrichProductsWithLiveStock(List<Product> products) {
+    private void addLiveStock(List<Product> products) {
         if (products == null) return;
         for (Product product : products) {
-            enrichProductWithLiveStock(product);
+            addLiveStock(product);
         }
     }
 }

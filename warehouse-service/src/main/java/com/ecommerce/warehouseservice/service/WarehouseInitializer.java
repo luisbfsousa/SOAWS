@@ -16,10 +16,13 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@ConditionalOnProperty(name = "warehouse.sync-on-startup", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "warehouse.sync-on-startup",
+        havingValue = "true",
+        matchIfMissing = true)
 public class WarehouseInitializer implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(WarehouseInitializer.class);
-private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
     private final InventoryService inventoryService;
     private static final String CATALOGUE_URL = "http://localhost:8082/products";
 
@@ -56,7 +59,7 @@ private final RestTemplate restTemplate;
                             int stock = ((Number) stockObj).intValue();
 
                             if (inventoryService.getStock(productId) == null) {
-                                inventoryService.addOrUpdateProduct(productId, stock);
+                                inventoryService.putProduct(productId, stock);
                                 log.info("Synced product {} with stock: {}", productId, stock);
                                 count++;
                             }
