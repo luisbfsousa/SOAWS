@@ -4,6 +4,7 @@ import com.ecommerce.datatransfer.AuthRequest;
 import com.ecommerce.datatransfer.AuthResponse;
 import com.ecommerce.datatransfer.RegisterRequest;
 import com.ecommerce.model.User;
+import com.ecommerce.model.UserRole;
 import com.ecommerce.service.AuthService;
 import com.ecommerce.service.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         try {
-            User user = authService.register(request.getUsername(), request.getPassword(), request.getRole());
+            User user = authService.register(
+                    request.getUsername(),
+                    request.getPassword(),
+                    UserRole.CUSTOMER);
             String token = jwtUtil.generateToken(user);
             AuthResponse response = AuthResponse.builder()
                     .id(user.getId())
