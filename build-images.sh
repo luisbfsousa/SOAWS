@@ -9,3 +9,4 @@ docker build -f authentication-service/Dockerfile -t ${REGISTRY}/authentication-
 docker build -f payment-service/Dockerfile -t ${REGISTRY}/payment-service:${VERSION} .
 docker build -f warehouse-service/Dockerfile -t ${REGISTRY}/warehouse-service:${VERSION} .
 docker build -f cart-service/Dockerfile -t ${REGISTRY}/cart-service:${VERSION} .
+docker build -f frontend/Dockerfile -t ${REGISTRY}/frontend:${VERSION} .
