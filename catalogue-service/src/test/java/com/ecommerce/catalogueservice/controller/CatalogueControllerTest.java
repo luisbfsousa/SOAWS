@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -58,6 +58,9 @@ class CatalogueControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Magical Homework Machine"))
                 .andExpect(jsonPath("$[0].category").value("Miracles"));
+
+        verify(productRepository).findAll();
+        verify(warehouseService).getStockFromWarehouse(101L);
     }
 
     @Test
@@ -69,6 +72,9 @@ class CatalogueControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Magical Homework Machine"))
                 .andExpect(jsonPath("$.stockQuantity").value(42));
+
+        verify(productRepository).findById(101L);
+        verify(warehouseService).getStockFromWarehouse(101L);
     }
 
     @Test
@@ -77,6 +83,8 @@ class CatalogueControllerTest {
 
         mockMvc.perform(get("/products/{id}", 999L))
                 .andExpect(status().isNotFound());
+
+        verify(productRepository).findById(999L);
     }
 
     @Test
@@ -95,6 +103,8 @@ class CatalogueControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Infinite Pizza Box"))
                 .andExpect(jsonPath("$.price").value(19.99));
+
+        verify(productRepository).save(any(Product.class));
     }
 
     @Test
@@ -110,6 +120,9 @@ class CatalogueControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(101))
                 .andExpect(jsonPath("$.newStock").value(3)); // 5 - 2 = 3
+
+        verify(productRepository).findById(101L);
+        verify(productRepository).save(any(Product.class));
     }
 
     @Test
@@ -118,5 +131,7 @@ class CatalogueControllerTest {
 
         mockMvc.perform(delete("/products/{id}", 101L))
                 .andExpect(status().isNoContent());
+
+        verify(productRepository).existsById(101L);
     }
 }

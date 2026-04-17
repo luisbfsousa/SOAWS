@@ -7,5 +7,6 @@ com\ecommerce\model\User.class
 com\ecommerce\service\AuthService.class
 com\ecommerce\datatransfer\AuthRequest.class
 com\ecommerce\controller\AuthController.class
+com\ecommerce\service\JwtUtil.class
 com\ecommerce\AuthenticationServiceApplication.class
 com\ecommerce\model\UserRole.class

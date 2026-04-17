@@ -41,6 +41,8 @@ class WarehouseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.9001").value(50))
                 .andExpect(jsonPath("$.42").value(1));
+
+        verify(inventoryService).getInventory();
     }
 
     @Test
@@ -52,6 +54,8 @@ class WarehouseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.productId").value(1337))
                 .andExpect(jsonPath("$.stock").value(999));
+
+        verify(inventoryService).getStock(secretStashId);
     }
 
     @Test
@@ -61,6 +65,8 @@ class WarehouseControllerTest {
 
         mockMvc.perform(get("/warehouse/inventory/{productId}", stolenItem))
                 .andExpect(status().isNotFound());
+
+        verify(inventoryService).getStock(stolenItem);
     }
 
     @Test
@@ -78,6 +84,8 @@ class WarehouseControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.productId").value(9000))
                 .andExpect(jsonPath("$.stock").value(9001));
+
+        verify(inventoryService).addOrUpdateProduct(9000L, 9001);
     }
 
     @Test
@@ -86,7 +94,7 @@ class WarehouseControllerTest {
                 "quantity", -5
         );
 
-        doNothing().when(inventoryService).updateStockByDelta(101L, -5);
+        doNothing().when(inventoryService).updateStock(101L, -5);
         when(inventoryService.getStock(101L)).thenReturn(45); // originally 50
 
         mockMvc.perform(patch("/warehouse/inventory/{productId}", 101L)
@@ -95,6 +103,8 @@ class WarehouseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.productId").value(101))
                 .andExpect(jsonPath("$.newStock").value(45));
+
+        verify(inventoryService).updateStock(101L, -5);
     }
 
     @Test
@@ -103,7 +113,7 @@ class WarehouseControllerTest {
                 "newStock", 100
         );
 
-        doNothing().when(inventoryService).setStockAbsolute(202L, 100);
+        doNothing().when(inventoryService).setStock(202L, 100);
         when(inventoryService.getStock(202L)).thenReturn(100);
 
         mockMvc.perform(patch("/warehouse/inventory/{productId}", 202L)
@@ -112,5 +122,7 @@ class WarehouseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.productId").value(202))
                 .andExpect(jsonPath("$.newStock").value(100));
+
+        verify(inventoryService).setStock(202L, 100);
     }
 }

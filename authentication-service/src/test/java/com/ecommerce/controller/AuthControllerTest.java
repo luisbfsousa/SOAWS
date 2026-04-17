@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,6 +63,9 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.role").value("CUSTOMER"))
                 .andExpect(jsonPath("$.token").value("totally-real-token"))
                 .andExpect(jsonPath("$.message").value("User registered successfully"));
+
+        verify(authService).register(anyString(), anyString(), any(UserRole.class));
+        verify(jwtUtil).generateToken(mockUser);
     }
 
     @Test
@@ -77,6 +80,8 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Username already exists"));
+
+        verify(authService).register(anyString(), anyString(), any(UserRole.class));
     }
 
     @Test
@@ -93,6 +98,9 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.username").value("real user"))
                 .andExpect(jsonPath("$.token").value("totally-real-token"))
                 .andExpect(jsonPath("$.message").value("Login successful"));
+
+        verify(authService).login("real user", "password123");
+        verify(jwtUtil).generateToken(mockUser);
     }
 
     @Test
@@ -107,5 +115,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Invalid password"));
+
+        verify(authService).login("real user", "wrongpassword");
     }
 }

@@ -78,6 +78,7 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.amount").value(999999.99))
                 .andExpect(jsonPath("$.status").value("SUCCESS"));
 
+        verify(paymentRepository, times(1)).save(any(Payment.class));
         verify(jmsTemplate, times(1)).convertAndSend(eq(PaymentController.ORDER_QUEUE), anyString());
     }
 
@@ -100,6 +101,7 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error").value("Invalid payment amount"));
 
+        verify(paymentRepository, times(1)).save(any(Payment.class));
         verify(jmsTemplate, never()).convertAndSend(anyString(), anyString());
     }
 
@@ -112,6 +114,8 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.transactionId").value(magicTransactionId))
                 .andExpect(jsonPath("$.amount").value(999999.99))
                 .andExpect(jsonPath("$.status").value("SUCCESS"));
+
+        verify(paymentRepository).findByTransactionId(magicTransactionId);
     }
 
     @Test
@@ -120,5 +124,7 @@ class PaymentControllerTest {
 
         mockMvc.perform(get("/payments/{transactionId}", "fake-receipt"))
                 .andExpect(status().isNotFound());
+
+        verify(paymentRepository).findByTransactionId("fake-receipt");
     }
 }

@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -62,6 +62,8 @@ class CartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[0].productName").value("Super Cool Energy Drink"))
                 .andExpect(jsonPath("$.subtotal").value(5.0));
+
+        verify(cartItemRepository).findBySessionId(totallyRealSession);
     }
 
     @Test
@@ -91,6 +93,10 @@ class CartControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.productName").value("Totally Rad Skateboard"))
                 .andExpect(jsonPath("$.quantity").value(1));
+
+        verify(catalogueClient).getProduct(coolProductId);
+        verify(cartItemRepository).findBySessionIdAndProductId(totallyRealSession, coolProductId);
+        verify(cartItemRepository).save(any(CartItem.class));
     }
 
     @Test
@@ -108,6 +114,8 @@ class CartControllerTest {
                         .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Product not found"));
+
+        verify(catalogueClient).getProduct(fakeProductId);
     }
 
     @Test
@@ -117,6 +125,8 @@ class CartControllerTest {
 
         mockMvc.perform(delete("/cart/{sessionId}/items/{productId}", totallyRealSession, productId))
                 .andExpect(status().isNoContent());
+
+        verify(cartItemRepository).findBySessionIdAndProductId(totallyRealSession, productId);
     }
 
     @Test
@@ -151,5 +161,12 @@ class CartControllerTest {
                 .andExpect(jsonPath("$.message").value("Order placed successfully"))
                 .andExpect(jsonPath("$.transactionId").value("TXN-MOMS-CARD-1234"))
                 .andExpect(jsonPath("$.total").value(10.99));
+
+        verify(cartItemRepository).findBySessionId(totallyRealSession);
+        verify(catalogueClient).getProduct(999L);
+        verify(warehouseClient).getWarehouseStock(999L);
+        verify(paymentClient).processPayment(eq(totallyRealSession), anyDouble(), eq("moms_credit_card"), eq("123 Student Dormitory Rd"));
+        verify(warehouseClient).decrementStock(eq(999L), anyInt());
+        verify(catalogueClient).decrementStock(eq(999L), anyInt());
     }
 }

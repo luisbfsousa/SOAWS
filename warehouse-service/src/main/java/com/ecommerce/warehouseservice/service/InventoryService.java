@@ -27,13 +27,13 @@ public class InventoryService {
         inventory.put(productId, Math.max(0, stock));
     }
 
-    public void updateStockByDelta(Long productId, int delta) {
+    public void updateStock(Long productId, int delta) {
         int current = inventory.getOrDefault(productId, 0);
         int newStock = Math.max(0, current + delta);
         inventory.put(productId, newStock);
     }
 
-    public void setStockAbsolute(Long productId, int stock) {
+    public void setStock(Long productId, int stock) {
         inventory.put(productId, Math.max(0, stock));
     }
 }

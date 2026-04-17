@@ -80,9 +80,9 @@ private final InventoryService inventoryService;
         log.info("Updating inventory for product {}{}{}", productId, isAbsoluteValue ? " with newStock: " : " with quantity delta: ", quantity);
 
         if (isAbsoluteValue) {
-            inventoryService.setStockAbsolute(productId, quantity);
+            inventoryService.setStock(productId, quantity);
         } else {
-            inventoryService.updateStockByDelta(productId, quantity);
+            inventoryService.updateStock(productId, quantity);
         }
 
         Integer newStock = inventoryService.getStock(productId);
